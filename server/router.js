@@ -1,6 +1,6 @@
 "use strict";
 
-const {"http":{ Router, methods }} = require("director");
+const {"http":{Router, methods}} = require("director");
 const ArticleService = require("./service/article");
 const CategoryService = require("./service/tag");
 const ConfigService = require("./service/config");

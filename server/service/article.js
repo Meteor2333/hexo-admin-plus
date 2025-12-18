@@ -29,7 +29,7 @@ module.exports = class ArticleService {
     /**
      *  @return doc array
      */
-    list({ category, title, tag }) {
+    list({category, title, tag}) {
         return this.model.filter(i =>
             (!category || i.categories.some(c => c.name === category)) &&
                 (!tag || i.tags.some(c => c.name === tag)) &&
@@ -68,7 +68,7 @@ module.exports = class ArticleService {
      *          -  content
      *  @return  newDoc
      */
-    async create({ meta, content }) {
+    async create({meta, content}) {
         const compiled = hfm.parse(["---", meta, "---"].join("\n"));
         delete compiled._content;
 
@@ -94,7 +94,7 @@ module.exports = class ArticleService {
      *          -  content
      *  @return  newDoc
      */
-    async update(id, { meta, content }) {
+    async update(id, {meta, content}) {
         const doc = this.detail(id);
 
         const compiled = hfm.parse(["---", meta, "---", content].join("\n"));
