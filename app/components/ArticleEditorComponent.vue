@@ -19,8 +19,8 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from "vue";
-import {ElMessage} from "element-plus";
+import { ref, onMounted } from "vue";
+import { ElMessage } from "element-plus";
 
 import vMdEditor from "@kangc/v-md-editor/lib/codemirror-editor";
 import "@kangc/v-md-editor/lib/style/codemirror-editor.css";
@@ -72,7 +72,7 @@ const meta = ref("");
 const content = ref("");
 onMounted(async () => {
     if (props.articleId) {
-        const {data} = await api.raw(props.articleId);
+        const { data } = await api.raw(props.articleId);
         meta.value = data.meta;
         content.value = data.content;
     } else {
@@ -83,14 +83,14 @@ onMounted(async () => {
 
 async function handleSave() {
     ElMessage.primary("Saving...");
-    const info = {"meta": meta.value, "content": content.value};
+    const info = { "meta": meta.value, "content": content.value };
     if (props.articleId) {
-        const {code} = await api.update(props.articleId, info);
+        const { code } = await api.update(props.articleId, info);
         if (!code) {
             ElMessage.success("Updated successfully!");
         }
     } else {
-        const {code, data} = await api.create(info);
+        const { code, data } = await api.create(info);
         if (!code) {
             ElMessage.success("Created successfully!");
             emit("save", data);

@@ -11,6 +11,6 @@ import postApi from "@/service/post";
 import router from "@/router";
 
 function handleSave(data) {
-    router.replace({"name":"EditPost", "params":{"postId": data._id}});
+    router.replace({ "name":"EditPost", "params":{ "postId": data._id } });
 }
 </script>

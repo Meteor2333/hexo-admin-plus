@@ -28,14 +28,14 @@ module.exports = {
         const category = this.req.query.category?.trim();
         const tag = this.req.query.tag?.trim();
         const pageSize = 15;
-        const postList = this.service[type].list({category, tag, title});
+        const postList = this.service[type].list({ category, tag, title });
 
         const total = postList.length;
         const list = postList
             .skip(page * pageSize)
             .limit(pageSize)
             .map(p => articleMapping(p, false));
-        this.res.send({list, total});
+        this.res.send({ list, total });
     },
 
     detail(type, id) {
@@ -46,20 +46,20 @@ module.exports = {
     raw(type, id) {
         const article = this.service[type].raw(id);
         if (!article) throw new Error("The article with ID " + id + " was not found.");
-        this.res.send({"meta": article.data, "content": article.content});
+        this.res.send({ "meta": article.data, "content": article.content });
     },
     async create(type) {
-        const {meta, content} = this.req.body;
-        const article = await this.service[type].create({meta, content});
+        const { meta, content } = this.req.body;
+        const article = await this.service[type].create({ meta, content });
         this.res.send(articleMapping(article));
     },
 
     async update(type, id) {
-        const {meta, content} = this.req.body;
+        const { meta, content } = this.req.body;
         if (!this.service[type].detail(id))
             throw new Error("The article with ID " + id + " was not found.");
 
-        const article = await this.service[type].update(id, {meta, content});
+        const article = await this.service[type].update(id, { meta, content });
         this.res.send(articleMapping(article));
     },
 
@@ -73,14 +73,14 @@ module.exports = {
     async publishPost(id) {
         if (!this.service.post.detail(id))
             throw new Error("The article with ID " + id + " was not found.");
-        const {_id} = await this.service.post.publish(id);
-        this.res.send({_id});
+        const { _id } = await this.service.post.publish(id);
+        this.res.send({ _id });
     },
 
     async unpublishPost(id) {
         if (!this.service.post.detail(id))
             throw new Error("The article with ID " + id + " was not found.");
-        const {_id} = await this.service.post.unpublish(id);
-        this.res.send({_id});
+        const { _id } = await this.service.post.unpublish(id);
+        this.res.send({ _id });
     },
 };

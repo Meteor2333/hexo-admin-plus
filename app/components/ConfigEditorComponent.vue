@@ -31,8 +31,8 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from "vue";
-import {ElMessage} from "element-plus";
+import { ref, onMounted } from "vue";
+import { ElMessage } from "element-plus";
 
 import Codemirror from "codemirror-editor-vue3";
 import "codemirror/mode/yaml/yaml";
@@ -45,7 +45,7 @@ const props = defineProps(["updateApi", "getApi"]);
 
 const configData = ref("");
 onMounted(async () => {
-    const {data} = await props.getApi();
+    const { data } = await props.getApi();
     if (data) {
         configData.value = data.config;
     }
@@ -53,7 +53,7 @@ onMounted(async () => {
 
 async function handleSave() {
     ElMessage.primary("Saving...");
-    const {code} = await props.updateApi(configData.value);
+    const { code } = await props.updateApi(configData.value);
     if (!code) {
         ElMessage.success("Updated successfully!");
         emit("save", configData.value);

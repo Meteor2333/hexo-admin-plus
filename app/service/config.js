@@ -6,7 +6,7 @@ export default {
     },
     
     updateConfig(config) {
-        return request.post("config", {config});
+        return request.post("config", { config });
     },
 
     getThemeConfig() {
@@ -14,6 +14,6 @@ export default {
     },
     
     updateThemeConfig(config) {
-        return request.post("themeconfig", {config});
+        return request.post("themeconfig", { config });
     },
 };

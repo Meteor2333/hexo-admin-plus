@@ -32,7 +32,7 @@ hexo.extend.filter.register("server_middleware", function (app) {
 
     // params
     app.use(apiRoot, connectQuery());
-    app.use(apiRoot, bodyParser.json({"limit": "50mb"}));
+    app.use(apiRoot, bodyParser.json({ "limit": "50mb" }));
 
     // helper
     app.use(apiRoot, middleware.helper);

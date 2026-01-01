@@ -101,9 +101,9 @@
 </template>
 
 <script setup>
-import {ref, reactive} from "vue";
-import {dialogLoginVisible} from "./service/_request";
-import {useRoute, useRouter} from "vue-router";
+import { ref, reactive } from "vue";
+import { dialogLoginVisible } from "./service/_request";
+import { useRoute, useRouter } from "vue-router";
 import authApi from "@/service/auth";
 
 const route = useRoute();
@@ -126,7 +126,7 @@ async function handelLogin() {
         return;
     }
 
-    const {code} = await authApi.login(loginForm);
+    const { code } = await authApi.login(loginForm);
     if (!code) {
         dialogLoginVisible.value = false;
         router.go(0);

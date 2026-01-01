@@ -11,6 +11,6 @@ import pageApi from "@/service/page";
 import router from "@/router";
 
 function handleSave(data) {
-    router.replace({"name":"EditPage", "params":{"pageId": data._id}});
+    router.replace({ "name":"EditPage", "params":{ "pageId": data._id } });
 }
 </script>

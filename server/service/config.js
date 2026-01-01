@@ -1,7 +1,7 @@
 "use strict";
 
-const {join, dirname} = require("path");
-const {exists, readFile, writeFile} = require("hexo-fs");
+const { join, dirname } = require("path");
+const { exists, readFile, writeFile } = require("hexo-fs");
 
 const hexoPath = dirname(require.resolve("hexo")); 
 const loadConfig = require(join(hexoPath, "load_config"));
@@ -46,7 +46,7 @@ module.exports = class ConfigService {
         await writeFile(configPath, data);
 
         // hexo/lib/hexo/load_theme_config.js
-        const baseConfig = this.hexo.render.render({"path": this.hexo.config_path});
+        const baseConfig = this.hexo.render.render({ "path": this.hexo.config_path });
         this.hexo.config.theme_config = baseConfig.theme_config;
         await loadThemeConfig(this.hexo);
         await this.hexo.load();

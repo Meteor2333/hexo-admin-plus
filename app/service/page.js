@@ -1,9 +1,9 @@
 import request from "./_request";
 
 export default {
-    list({page, title, category, tag}) {
-        const params = {page, title, category, tag};
-        return request.get("page", {params});
+    list({ page, title, category, tag }) {
+        const params = { page, title, category, tag };
+        return request.get("page", { params });
     },
     detail(id) {
         return request.get(`page/${id}`);

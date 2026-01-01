@@ -4,7 +4,7 @@ module.exports.helper = function (req, resp, next) {
     resp.send = function (data) {
         resp.setHeader("Content-Type", "application/json");
 
-        const ret = {"msg": "unknow error", "code": -1};
+        const ret = { "msg": "unknow error", "code": -1 };
 
         switch (typeof (data)) {
             case "string":

@@ -29,7 +29,7 @@
     "quote-props": ["error", "always"],
     "space-before-function-paren": ["error", {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
     "comma-dangle": ["error", "always-multiline"],
-    "object-curly-spacing": ["error", "never"],
+    "object-curly-spacing": ["error", "always"],
     "no-var": "error",
     "prefer-const": "error",
     "array-bracket-spacing": ["error", "never"]

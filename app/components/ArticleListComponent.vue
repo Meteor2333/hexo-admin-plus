@@ -203,9 +203,9 @@
 </template>
 
 <script setup>
-import {ref, reactive, onMounted, computed, watch} from "vue";
-import {useRouter} from "vue-router";
-import {ElMessage, ElMessageBox} from "element-plus";
+import { ref, reactive, onMounted, computed, watch } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage, ElMessageBox } from "element-plus";
 import dateFormat from "dateformat";
 
 import postApi from "../service/post";
@@ -218,7 +218,7 @@ const props = defineProps({
     "filter": {
         "type": Boolean,
         "default": false,
-    }});
+    } });
 const api = props.articleType === "post" ? postApi : pageApi;
 
 const multipleSelection = ref([]);
@@ -243,17 +243,17 @@ const tableData = computed(() =>
         "date": dateFormat(new Date(p.date), "yyyy-mm-dd hh:MM:ss"),
         "isDraft": p.isDraft,
         "to": props.articleType === "post" ?
-            {"name": "EditPost", "params": {"postId": p._id}}:
-            {"name": "EditPage", "params": {"pageId": p._id}},
+            { "name": "EditPost", "params": { "postId": p._id } }:
+            { "name": "EditPage", "params": { "pageId": p._id } },
     })),
 );
 
 function handleNewPost() {
-    router.push({"name": "AddPost"});
+    router.push({ "name": "AddPost" });
 }
 
 function handleNewPage() {
-    router.push({"name": "AddPage"});
+    router.push({ "name": "AddPage" });
 }
 
 function handleSelectionChange(val) {
@@ -261,7 +261,7 @@ function handleSelectionChange(val) {
 }
 
 async function handlePublish(articleId) {
-    const {code, data} = await api.publish(articleId);
+    const { code, data } = await api.publish(articleId);
     if (code) return;
     ElMessage.success("Published successfully!");
     const p = articleList.value.find(p => p._id === articleId);
@@ -271,7 +271,7 @@ async function handlePublish(articleId) {
 }
 
 async function handleUnpublish(articleId) {
-    const {code, data} = await api.unpublish(articleId);
+    const { code, data } = await api.unpublish(articleId);
     if (code) return;
     ElMessage.success("Unpublished successfully!");
     const p = articleList.value.find(p => p._id === articleId);
@@ -281,7 +281,7 @@ async function handleUnpublish(articleId) {
 }
 
 async function handleRemove(articleId) {
-    const {code} = await api.remove(articleId);
+    const { code } = await api.remove(articleId);
     if (code) return;
     ElMessage.success("Removed successfully!");
     const pIdx = articleList.value.findIndex(p => p._id === articleId);
@@ -305,8 +305,8 @@ function confirmRemove(callback) {
 
 async function loadList(page = 1) {
     isLoading.value = true;
-    const options = Object.assign({page}, filterForm);
-    const {data} = await api.list(options);
+    const options = Object.assign({ page }, filterForm);
+    const { data } = await api.list(options);
     articleList.value = data.list;
     total.value = data.total;
     currentPage.value = page;
@@ -314,14 +314,14 @@ async function loadList(page = 1) {
 }
   
 async function searchCategoryName() {
-    const {data} = await taxonomyApi.getCategoryList();
+    const { data } = await taxonomyApi.getCategoryList();
     if (data) {
         categoryOptions.value = data.list;
     }
 }
 
 async function searchTagName(name) {
-    const {data} = await taxonomyApi.getTagList(name);
+    const { data } = await taxonomyApi.getTagList(name);
     if (data) {
         tagOptions.value = data.list;
     }

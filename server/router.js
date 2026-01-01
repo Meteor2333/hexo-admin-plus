@@ -1,6 +1,6 @@
 "use strict";
 
-const {"http":{Router, methods}} = require("director");
+const { "http":{ Router, methods } } = require("director");
 const ArticleService = require("./service/article");
 const TaxonomyService = require("./service/taxonomy");
 const ConfigService = require("./service/config");
@@ -10,7 +10,7 @@ const configController = require("./controller/config");
 const authController = require("./controller/auth");
 
 const router = new Router();
-router.configure({"async": true, "recurse": false, "strict": false});
+router.configure({ "async": true, "recurse": false, "strict": false });
 
 // rewite methods for async controller
 methods.forEach((m) => {

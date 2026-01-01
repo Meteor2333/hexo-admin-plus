@@ -1,9 +1,9 @@
-import {ref} from "vue";
-import {ElMessage} from "element-plus";
+import { ref } from "vue";
+import { ElMessage } from "element-plus";
 import axios from "axios";
 
 axios.defaults.headers["Content-Type"] = "application/json";
-const service = axios.create({"baseURL": "./api", "timeout": 100000});
+const service = axios.create({ "baseURL": "./api", "timeout": 100000 });
 
 service.interceptors.response.use(
     (response) => {

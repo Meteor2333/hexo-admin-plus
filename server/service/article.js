@@ -18,7 +18,7 @@ module.exports = class ArticleService {
         return fullPath.slice(this.hexo.source_dir.length).replace(/\\/g, "/");
     }
 
-    list({category, tag, title}) {
+    list({ category, tag, title }) {
         return this.model.filter(i =>
             (!category || i.categories.some(c => c.name === category)) &&
                 (!tag || i.tags.some(c => c.name === tag)) &&
@@ -42,7 +42,7 @@ module.exports = class ArticleService {
     }
 
     // todo: 重复文章创建检查
-    async create({meta, content}) {
+    async create({ meta, content }) {
         const compiled = hfm.parse(["---", meta, "---"].join("\n"));
         delete compiled._content;
 
@@ -58,10 +58,10 @@ module.exports = class ArticleService {
         }
         const file = await this.hexo.post.create(compiled);
         await this.hexo.source.process();
-        return this.detail({"source": this.getSource(file.path)});
+        return this.detail({ "source": this.getSource(file.path) });
     }
 
-    async update(id, {meta, content}) {
+    async update(id, { meta, content }) {
         const doc = this.detail(id);
 
         const compiled = hfm.parse(["---", meta, "---", content].join("\n"));
@@ -74,7 +74,7 @@ module.exports = class ArticleService {
 
         await fs.writeFile(doc.full_source, hfm.stringify(compiled));
         await this.hexo.source.process();
-        return this.detail({"source": this.getSource(doc.full_source)});
+        return this.detail({ "source": this.getSource(doc.full_source) });
     }
 
     async delete(id) {
@@ -96,7 +96,7 @@ module.exports = class ArticleService {
         await fs.rename(doc.full_source, fullSource);
         await this.hexo.source.process();
         const source = this.getSource(fullSource);
-        return this.detail({source});
+        return this.detail({ source });
     }
 
     async unpublish(id) {
@@ -111,6 +111,6 @@ module.exports = class ArticleService {
 
         const source = this.getSource(fullSource);
         await this.hexo.source.process();
-        return this.detail({source});
+        return this.detail({ source });
     }
 };

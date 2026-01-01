@@ -1,9 +1,9 @@
-import {createRouter, createWebHashHistory} from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 const routes = [
     {
         "path": "/",
-        "redirect": {"name": "PostList"},
+        "redirect": { "name": "PostList" },
     },
     {
         "path": "/post/new",
@@ -53,5 +53,5 @@ const routes = [
     },
 ];
 
-const router = createRouter({"history": createWebHashHistory(), routes});
+const router = createRouter({ "history": createWebHashHistory(), routes });
 export default router;
