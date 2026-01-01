@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import articleList from "@/components/ArticleListCom.vue";
+import articleList from "@/components/ArticleListComponent.vue";
 </script>

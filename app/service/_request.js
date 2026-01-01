@@ -1,34 +1,34 @@
+import {ref} from "vue";
 import {ElMessage} from "element-plus";
 import axios from "axios";
-import router from "@/router";
 
 axios.defaults.headers["Content-Type"] = "application/json";
 const service = axios.create({"baseURL": "./api", "timeout": 100000});
 
 service.interceptors.response.use(
-    (res) => {
+    (response) => {
         if (
-            res.request.responseType === "blob" ||
-            res.request.responseType === "arraybuffer"
+            response.request.responseType === "blob" ||
+            response.request.responseType === "arraybuffer"
         ) {
-            return res.data;
+            return response.data;
         }
-        const code = res.data.code;
-        if (!code) return res.data;
-
-        const msg = res.data.data || res.data.msg || `Error: ${code}`;
-
-        ElMessage.error(msg);
-
+        
+        const code = response.data.code;
+        if (!code) return response.data;
         if (code === 401) {
-            router.replace({"path": "/login"});
-            throw new Error("Illegal login");
+            dialogLoginVisible.value = true;
+            return null;
         }
-        return res.data;
-    }, ({message}) => {
-        ElMessage.error(message);
-        return {"code": -1};
+
+        ElMessage.warning(response.data.data ?? response.data.msg ?? `Code: ${code}`);
+        return response.data;
+    }, (error) => {
+        ElMessage.error(error.message);
+        return Promise.reject(error);
     },
 );
 
 export default service;
+
+export const dialogLoginVisible = ref(false);

@@ -4,13 +4,56 @@
     class="page"
     element-loading-text="loading..."
   >
-    <el-header v-if="filter">
+    <el-header>
+      <div class="buttons">
+        <el-button
+          v-if="articleType==='post'"
+          type="primary"
+          @click="handleNewPost"
+        >
+          New Post
+        </el-button>
+        <el-button
+          v-if="articleType==='page'"
+          type="primary"
+          @click="handleNewPage"
+        >
+          New Page
+        </el-button>
+        <el-button-group
+          v-if="multipleSelection.length"
+          class="options"
+        >
+          <el-button
+            type="success"
+            @click="multipleSelection.forEach(item => handlePublish(item._id))"
+          >
+            Publish
+          </el-button>
+          <el-button
+            type="warning"
+            @click="multipleSelection.forEach(item => handleUnpublish(item._id))"
+          >
+            Unpublish
+          </el-button>
+          <el-button
+            type="danger"
+            @click="confirmRemove(() => multipleSelection.forEach(item => handleRemove(item._id)))"
+          >
+            Remove
+          </el-button>
+        </el-button-group>
+      </div>
       <el-form inline>
-        <el-form-item>
+        <el-form-item v-if="filter">
           <el-select
             v-model="filterForm.category"
-            placeholder="category"
+            filterable
+            remote
             clearable
+            remote-show-suffix
+            :remote-method="searchCategoryName"
+            placeholder="category"
           >
             <el-option
               v-for="(c,idx) in categoryOptions"
@@ -20,7 +63,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item>
+        <el-form-item v-if="filter">
           <el-select
             v-model="filterForm.tag"
             filterable
@@ -48,12 +91,21 @@
       </el-form>
     </el-header>
     <el-main class="page-body">
-      <el-table :data="tableData">
+      <el-table
+        stripe
+        :data="tableData"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column
+          type="selection"
+          width="55"
+        />
         <el-table-column
           fixed
+          sortable
           prop="title"
           label="Title"
-          width="380"
+          width="420"
         >
           <template #default="{ row }">
             <router-link :to="row.to">
@@ -65,17 +117,20 @@
         </el-table-column>
         <el-table-column
           v-if="articleType==='post'"
+          sortable
           prop="categories"
           label="Categories"
         />
         <el-table-column
           v-if="articleType==='post'"
+          sortable
           prop="tags"
           label="Tags"
         />
         <el-table-column
           prop="date"
           label="CreateTime"
+          sortable
         />
         <el-table-column label="Status">
           <template #default="{ row }">
@@ -83,45 +138,46 @@
               v-if="row.isDraft"
               type="warning"
             >
-              draft
+              Draft
             </el-text>
             <el-text
               v-else
               type="success"
             >
-              published
+              Published
             </el-text>
           </template>
         </el-table-column>
-
         <el-table-column
-          fixed="right"
           label="Operations"
-          width="190"
+          width="250"
         >
           <template #default="{ row }">
             <el-button
               v-if="row.isDraft && api.publish"
-              type="success"
+              plain
               size="small"
+              type="success"
               @click="handlePublish(row._id)"
             >
-              publish
+              Publish
             </el-button>
             <el-button
               v-else-if="api.unpublish"
-              type="warning"
+              plain
               size="small"
+              type="warning"
               @click="handleUnpublish(row._id)"
             >
-              unpublish
+              Unpublish
             </el-button>
             <el-button
-              type="danger"
+              plain
               size="small"
-              @click="handleRemove(row._id)"
+              type="danger"
+              @click="confirmRemove(() => handleRemove(row._id))"
             >
-              remove
+              Remove
             </el-button>
           </template>
         </el-table-column>
@@ -135,11 +191,10 @@
     </el-main>
     <el-footer class="page-footer">
       <el-pagination
-        v-if="total>0"
         v-model:current-page="currentPage"
-        small
         background
-        layout="->, prev, pager, next"
+        hide-on-single-page
+        layout="->, total, prev, pager, next, jumper"
         :page-size="15"
         :total="total"
       />
@@ -149,13 +204,15 @@
 
 <script setup>
 import {ref, reactive, onMounted, computed, watch} from "vue";
-import {ElMessage} from "element-plus";
+import {useRouter} from "vue-router";
+import {ElMessage, ElMessageBox} from "element-plus";
 import dateFormat from "dateformat";
 
 import postApi from "../service/post";
 import pageApi from "../service/page";
-import tagApi from "../service/tag";
+import taxonomyApi from "../service/taxonomy";
 
+const router = useRouter();
 const props = defineProps({
     "articleType": String,
     "filter": {
@@ -164,9 +221,11 @@ const props = defineProps({
     }});
 const api = props.articleType === "post" ? postApi : pageApi;
 
+const multipleSelection = ref([]);
+
 const filterForm = reactive({});
-const categoryOptions = ref([]);
 const tagOptions = ref([]);
+const categoryOptions = ref([]);
 
 const articleList = ref([]);
 const total = ref(0);
@@ -178,22 +237,33 @@ const tableData = computed(() =>
         "_id": p._id,
         "title": p.title,
         "link": p.link,
-        "tags": p.tags?.join(", ") || "-",
         "categories": p.categories?.join(", ") || "-",
+        "tags": p.tags?.join(", ") || "-",
         "updated": dateFormat(new Date(p.updated), "yyyy-mm-dd hh:MM:ss"),
         "date": dateFormat(new Date(p.date), "yyyy-mm-dd hh:MM:ss"),
         "isDraft": p.isDraft,
         "to": props.articleType === "post" ?
-            {"name": "PostDetail", "params": {"postId": p._id}}:
-            {"name": "PageDetail", "params": {"pageId": p._id}},
-
+            {"name": "EditPost", "params": {"postId": p._id}}:
+            {"name": "EditPage", "params": {"pageId": p._id}},
     })),
 );
+
+function handleNewPost() {
+    router.push({"name": "AddPost"});
+}
+
+function handleNewPage() {
+    router.push({"name": "AddPage"});
+}
+
+function handleSelectionChange(val) {
+    multipleSelection.value = val;
+}
 
 async function handlePublish(articleId) {
     const {code, data} = await api.publish(articleId);
     if (code) return;
-    ElMessage.success("publish success");
+    ElMessage.success("Published successfully!");
     const p = articleList.value.find(p => p._id === articleId);
     p.isDraft = false;
     p._id = data._id;
@@ -203,7 +273,7 @@ async function handlePublish(articleId) {
 async function handleUnpublish(articleId) {
     const {code, data} = await api.unpublish(articleId);
     if (code) return;
-    ElMessage.success("unpublish success");
+    ElMessage.success("Unpublished successfully!");
     const p = articleList.value.find(p => p._id === articleId);
     p.isDraft = true;
     p._id = data._id;
@@ -213,9 +283,24 @@ async function handleUnpublish(articleId) {
 async function handleRemove(articleId) {
     const {code} = await api.remove(articleId);
     if (code) return;
-    ElMessage.success("remove success");
+    ElMessage.success("Removed successfully!");
     const pIdx = articleList.value.findIndex(p => p._id === articleId);
     articleList.value.splice(pIdx, 1);
+    loadList(currentPage.value);
+}
+
+function confirmRemove(callback) {
+    ElMessageBox.confirm(
+        "Are you sure you want to remove the selected article(s)? This action cannot be undone.",
+        "Warning",
+        {
+            "confirmButtonText": "OK",
+            "cancelButtonText": "Cancel",
+            "type": "warning",
+        },
+    ).then(() => {
+        callback();
+    });
 }
 
 async function loadList(page = 1) {
@@ -227,17 +312,18 @@ async function loadList(page = 1) {
     currentPage.value = page;
     isLoading.value = false;
 }
-
-async function searchTagName(name) {
-    const {data} = await tagApi.getTagList(name);
-    if (data) {
-        tagOptions.value  = data.list;
-    }
-}
+  
 async function searchCategoryName() {
-    const {data} = await tagApi.getCategoryList();
+    const {data} = await taxonomyApi.getCategoryList();
     if (data) {
         categoryOptions.value = data.list;
+    }
+}
+
+async function searchTagName(name) {
+    const {data} = await taxonomyApi.getTagList(name);
+    if (data) {
+        tagOptions.value = data.list;
     }
 }
 
@@ -247,15 +333,17 @@ onMounted(() => {
     loadList(1);
     if (props.filter) {
         searchCategoryName();
+        searchTagName();
     }
 });
 </script>
 
 <style scoped>
-  .el-header { height: auto; padding: 10px; border-bottom: 1px solid var(--el-border-color); }
+  .buttons { display: inline-block; }
+  .options { margin-left: 15px; }
+  .el-header { display: flex; height: auto; padding: 10px; }
+  .el-form { flex: 1; text-align: right; }
   .el-form-item { margin-bottom: 0; }
   .el-table { height: 100%; }
-  .el-table .el-button { width: 80px; }
   .page-footer { text-align: right; }
 </style>
-

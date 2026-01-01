@@ -5,31 +5,20 @@ const fs = require("hexo-fs");
 const hfm = require("hexo-front-matter");
 
 module.exports = class ArticleService {
-    /**
-     *  @param  hexo hexo instance
-     *  @param  type [Post, Page]
-     */
     constructor(hexo, type) {
         if (type !== "Post" && type !== "Page") {
-            throw new Error("Modle Type should be Post or Page!");
+            throw new TypeError("Model type should be Post or Page.");
         }
         this.hexo = hexo;
         this.type = type;
         this.model = this.hexo.model(this.type);
     }
 
-    /**
-     *  @param  fullPath "/home/www/blog/source/_posts/hello.md"
-     *  @return source "_posts/hello.md"
-     */
     getSource(fullPath) {
         return fullPath.slice(this.hexo.source_dir.length).replace(/\\/g, "/");
     }
 
-    /**
-     *  @return doc array
-     */
-    list({category, title, tag}) {
+    list({category, tag, title}) {
         return this.model.filter(i =>
             (!category || i.categories.some(c => c.name === category)) &&
                 (!tag || i.tags.some(c => c.name === tag)) &&
@@ -38,10 +27,6 @@ module.exports = class ArticleService {
             .sort("date", -1);
     }
 
-    /**
-     *  @param  docId or query
-     *  @return doc detail
-     */
     detail(query) {
         if (typeof (query) === "string") {
             return this.model.findById(query);
@@ -50,29 +35,18 @@ module.exports = class ArticleService {
         }
     }
 
-    /**
-     *  @param  docId or query
-     *  @return doc raw
-     *          -  data
-     *          -  content
-     */
     raw(query) {
         const doc = this.detail(query);
         if (!doc) return null;
         return hfm.split(doc.raw);
     }
 
-    /**
-     *  @param  newDoc
-     *          -  meta
-     *          -  content
-     *  @return  newDoc
-     */
+    // todo: 重复文章创建检查
     async create({meta, content}) {
         const compiled = hfm.parse(["---", meta, "---"].join("\n"));
         delete compiled._content;
 
-        if (!compiled.title) throw new Error("title cant be null");
+        if (!compiled.title) throw new Error("Title cannot be empty.");
 
         compiled.updated = compiled.updated || new Date();
         compiled.content = content;
@@ -87,13 +61,6 @@ module.exports = class ArticleService {
         return this.detail({"source": this.getSource(file.path)});
     }
 
-    /**
-     *  @param  id
-     *  @param  doc
-     *          -  meta
-     *          -  content
-     *  @return  newDoc
-     */
     async update(id, {meta, content}) {
         const doc = this.detail(id);
 
@@ -110,10 +77,6 @@ module.exports = class ArticleService {
         return this.detail({"source": this.getSource(doc.full_source)});
     }
 
-    /**
-     *  @param  id
-     *  @return
-     */
     async delete(id) {
         const doc = this.detail(id);
         if (this.type === "Page") {
@@ -124,10 +87,6 @@ module.exports = class ArticleService {
         await this.hexo.source.process();
     }
 
-    /**
-     *  @param  id
-     *  @return newDoc
-     */
     async publish(id) {
         if (this.type === "Page") return;
         const doc = this.detail(id);
@@ -140,10 +99,6 @@ module.exports = class ArticleService {
         return this.detail({source});
     }
 
-    /**
-     *  @param  id
-     *  @return newDoc
-     */
     async unpublish(id) {
         if (this.type === "Page") return;
         const doc = this.detail(id);

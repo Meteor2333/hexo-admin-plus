@@ -2,10 +2,10 @@
 
 const {"http":{Router, methods}} = require("director");
 const ArticleService = require("./service/article");
-const CategoryService = require("./service/tag");
+const TaxonomyService = require("./service/taxonomy");
 const ConfigService = require("./service/config");
 const articleController = require("./controller/article");
-const tagController = require("./controller/tag");
+const taxonomyController = require("./controller/taxonomy");
 const configController = require("./controller/config");
 const authController = require("./controller/auth");
 
@@ -35,8 +35,8 @@ module.exports = function (hexo) {
         this.service = {
             "post": new ArticleService(hexo, "Post"),
             "page": new ArticleService(hexo, "Page"),
-            "category": new CategoryService(hexo, "Category"),
-            "tag": new CategoryService(hexo, "Tag"),
+            "category": new TaxonomyService(hexo, "Category"),
+            "tag": new TaxonomyService(hexo, "Tag"),
             "config": new ConfigService(hexo),
         };
     });
@@ -52,8 +52,8 @@ module.exports = function (hexo) {
     router.post("/post/:id/publish", articleController.publishPost);
     router.post("/post/:id/unpublish", articleController.unpublishPost);
 
-    router.param("tagtype", /(tag|category)/);
-    router.get("/:tagtype", tagController.list);
+    router.param("taxonomytype", /(tag|category)/);
+    router.get("/:taxonomytype", taxonomyController.list);
 
     router.get("/config", configController.getConfig);
     router.post("/config", configController.updateConfig);

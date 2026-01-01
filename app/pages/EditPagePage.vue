@@ -1,5 +1,5 @@
 <template>
-  <article-detail
+  <article-editor
     :article-api="pageApi"
     :article-id="route.params.pageId"
   />
@@ -7,7 +7,7 @@
 
 <script setup>
 import {useRoute} from "vue-router";
-import articleDetail from "@/components/ArticleEditorCom.vue";
+import articleEditor from "@/components/ArticleEditorComponent.vue";
 import pageApi from "@/service/page";
 const route = useRoute();
 </script>
