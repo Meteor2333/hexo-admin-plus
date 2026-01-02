@@ -8,9 +8,6 @@ const loadConfig = require(join(hexoPath, "load_config"));
 const loadThemeConfig = require(join(hexoPath, "load_theme_config"));
 
 module.exports = class ConfigService {
-    /**
-     *  @param  hexo hexo instance
-     */
     constructor(hexo, type) {
         this.hexo = hexo;
         this.model = this.hexo.model(type);
@@ -41,8 +38,11 @@ module.exports = class ConfigService {
     }
 
     async updateThemeConfig(data) {
-        const configPath = join(this.hexo.base_dir,
+        let configPath = join(this.hexo.base_dir,
             `_config.${this.hexo.config.theme}.yml`);
+        if (!await exists(configPath)) {
+            configPath = join(this.hexo.base_dir, `./themes/${this.hexo.config.theme}/_config.yml`);
+        }
         await writeFile(configPath, data);
 
         // hexo/lib/hexo/load_theme_config.js
