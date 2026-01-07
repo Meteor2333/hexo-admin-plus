@@ -1,11 +1,8 @@
 <template>
-  <config-editor
-    :update-api="configApi.updateThemeConfig"
-    :get-api="configApi.getThemeConfig"
-  />
+  <config-editor :api="themeConfigApi" />
 </template>
 
 <script setup>
 import ConfigEditor from "@/components/ConfigEditorComponent.vue";
-import configApi from "@/service/config";
+import themeConfigApi from "@/service/themeconfig";
 </script>

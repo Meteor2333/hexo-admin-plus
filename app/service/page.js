@@ -6,12 +6,8 @@ export default {
         return request.get("page", { params });
     },
 
-    detail(id) {
+    getData(id) {
         return request.get(`page/${id}`);
-    },
-
-    raw(id) {
-        return request.get(`page/${id}/raw`);
     },
 
     update(id, post) {

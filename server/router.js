@@ -45,17 +45,16 @@ module.exports = function (hexo) {
     router.post("/auth", authController.authenticate);
 
     router.param("arttype", /(post|page)/);
-    router.get("/:arttype", articleController.list);
-    router.get("/:arttype/:id", articleController.detail);
-    router.get("/:arttype/:id/raw", articleController.raw);
+    router.get("/:arttype", articleController.getArticles);
+    router.get("/:arttype/:id", articleController.getData);
     router.post("/:arttype", articleController.create);
     router.put("/:arttype/:id", articleController.update);
     router.delete("/:arttype/:id", articleController.delete);
-    router.post("/post/:id/publish", articleController.publishPost);
-    router.post("/post/:id/unpublish", articleController.unpublishPost);
+    router.post("/:arttype/:id/publish", articleController.publish);
+    router.post("/:arttype/:id/unpublish", articleController.unpublish);
 
     router.param("taxonomytype", /(tag|category)/);
-    router.get("/:taxonomytype", taxonomyController.list);
+    router.get("/:taxonomytype", taxonomyController.getTaxonomies);
 
     router.get("/config", configController.getConfig);
     router.post("/config", configController.updateConfig);

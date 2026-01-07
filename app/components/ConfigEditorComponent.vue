@@ -41,11 +41,12 @@ import "codemirror/addon/scroll/simplescrollbars";
 import "codemirror/addon/scroll/simplescrollbars.css";
 
 const emit = defineEmits(["save"]);
-const props = defineProps(["updateApi", "getApi"]);
+const props = defineProps(["api"]);
+const api = props.api;
 
 const configData = ref("");
 onMounted(async () => {
-    const { data } = await props.getApi();
+    const { data } = await api.getConfig();
     if (data) {
         configData.value = data.config;
     }
@@ -53,7 +54,7 @@ onMounted(async () => {
 
 async function handleSave() {
     ElMessage.primary("Saving...");
-    const { code } = await props.updateApi(configData.value);
+    const { code } = await api.updateConfig(configData.value);
     if (!code) {
         ElMessage.success("Updated successfully!");
         emit("save", configData.value);

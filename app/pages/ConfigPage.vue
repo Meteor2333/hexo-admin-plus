@@ -1,8 +1,5 @@
 <template>
-  <config-editor
-    :update-api="configApi.updateConfig"
-    :get-api="configApi.getConfig"
-  />
+  <config-editor :api="configApi" />
 </template>
 
 <script setup>

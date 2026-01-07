@@ -5,13 +5,9 @@ export default {
         const params = { page, title, category, tag };
         return request.get("post", { params });
     },
-    
-    detail(id) {
-        return request.get(`post/${id}`);
-    },
 
-    raw(id) {
-        return request.get(`post/${id}/raw`);
+    getData(id) {
+        return request.get(`post/${id}`);
     },
 
     update(id, post) {

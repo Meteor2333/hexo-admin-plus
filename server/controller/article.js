@@ -1,16 +1,17 @@
 "use strict";
 
-function articleMapping(article, isDetail = true) {
-    if (article instanceof Array) return article.map(articleMapping);
+function serializeArticle(article) {
+    if (article instanceof Array) return article.map(serializeArticle);
     const retPost = {
-        "_id": article._id,
+        "id": article._id,
         "title": article.title,
         "date": article.date.valueOf(),
         "updated": article.updated.valueOf(),
         "link": article.permalink,
         "isDraft": article.source.includes("_draft"),
     };
-    if (isDetail) {
+
+    if (article._content) {
         retPost["content"] = article._content;
     }
 
@@ -22,67 +23,51 @@ function articleMapping(article, isDetail = true) {
 }
 
 module.exports = {
-    list(type) {
+    getArticles(type) {
         const page = (+this.req.query.page || 1) - 1;
         const title = this.req.query.title?.trim();
         const category = this.req.query.category?.trim();
         const tag = this.req.query.tag?.trim();
         const pageSize = 15;
-        const postList = this.service[type].list({ category, tag, title });
-
+        const postList = this.service[type].getArticles({ title, category, tag });
         const total = postList.length;
         const list = postList
             .skip(page * pageSize)
             .limit(pageSize)
-            .map(p => articleMapping(p, false));
+            .map(serializeArticle);
         this.res.send({ list, total });
     },
-
-    detail(type, id) {
-        const article = this.service[type].detail(id);
-        if (!article) throw new Error("The article with ID " + id + " was not found.");
-        this.res.send(articleMapping(article));
-    },
     
-    raw(type, id) {
-        const article = this.service[type].raw(id);
-        if (!article) throw new Error("The article with ID " + id + " was not found.");
+    getData(type, id) {
+        const article = this.service[type].getData(id);
+        if (!article) throw new Error("Article with ID " + id + " was not found.");
         this.res.send({ "meta": article.data, "content": article.content });
     },
 
     async create(type) {
         const { meta, content } = this.req.body;
         const article = await this.service[type].create({ meta, content });
-        this.res.send(articleMapping(article));
+        this.res.send(serializeArticle(article));
     },
 
     async update(type, id) {
         const { meta, content } = this.req.body;
-        if (!this.service[type].detail(id))
-            throw new Error("The article with ID " + id + " was not found.");
-
         const article = await this.service[type].update(id, { meta, content });
-        this.res.send(articleMapping(article));
+        this.res.send(serializeArticle(article));
     },
 
     async delete(type, id) {
-        if (!this.service[type].detail(id))
-            throw new Error("The article with ID " + id + " was not found.");
         await this.service[type].delete(id);
         this.res.send();
     },
 
-    async publishPost(id) {
-        if (!this.service.post.detail(id))
-            throw new Error("The article with ID " + id + " was not found.");
-        const { _id } = await this.service.post.publish(id);
-        this.res.send({ _id });
+    async publish(type, id) {
+        const article = await this.service[type].publish(id);
+        this.res.send(serializeArticle(article));
     },
 
-    async unpublishPost(id) {
-        if (!this.service.post.detail(id))
-            throw new Error("The article with ID " + id + " was not found.");
-        const { _id } = await this.service.post.unpublish(id);
-        this.res.send({ _id });
+    async unpublish(type, id) {
+        const article = await this.service[type].unpublish(id);
+        this.res.send(serializeArticle(article));
     },
 };

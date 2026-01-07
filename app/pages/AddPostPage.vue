@@ -1,6 +1,6 @@
 <template>
   <article-editor
-    :article-api="postApi"
+    :api="postApi"
     @create="handleCreate"
   />
 </template>
@@ -11,6 +11,6 @@ import postApi from "@/service/post";
 import router from "@/router";
 
 function handleCreate(data) {
-    router.replace({ "name":"EditPost", "params":{ "postId": data._id } });
+    router.replace({ "name":"EditPost", "params":{ "postId": data.id } });
 }
 </script>

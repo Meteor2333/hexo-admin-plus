@@ -1,7 +1,7 @@
 <template>
   <article-editor
-    :article-api="pageApi"
-    :article-id="route.params.pageId"
+    :api="pageApi"
+    :article="route.params.pageId"
   />
 </template>
 

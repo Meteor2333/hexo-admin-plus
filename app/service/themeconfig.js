@@ -2,10 +2,10 @@ import request from "@/request";
 
 export default {
     getConfig() {
-        return request.get("config");
+        return request.get("themeconfig");
     },
     
     updateConfig(config) {
-        return request.post("config", { config });
+        return request.post("themeconfig", { config });
     },
 };

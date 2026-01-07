@@ -7,14 +7,14 @@
     <el-header>
       <div class="buttons">
         <el-button
-          v-if="articleType==='post'"
+          v-if="type==='post'"
           type="primary"
           @click="handleNewPost"
         >
           New Post
         </el-button>
         <el-button
-          v-if="articleType==='page'"
+          v-if="type==='page'"
           type="primary"
           @click="handleNewPage"
         >
@@ -26,26 +26,26 @@
         >
           <el-button
             type="success"
-            @click="multipleSelection.forEach(item => handlePublish(item._id))"
+            @click="multipleSelection.forEach(item => handlePublish(item.id))"
           >
             Publish
           </el-button>
           <el-button
             type="warning"
-            @click="multipleSelection.forEach(item => handleUnpublish(item._id))"
+            @click="multipleSelection.forEach(item => handleUnpublish(item.id))"
           >
             Unpublish
           </el-button>
           <el-button
             type="danger"
-            @click="confirmRemove(() => multipleSelection.forEach(item => handleRemove(item._id)))"
+            @click="confirmRemove(() => multipleSelection.forEach(item => handleRemove(item.id)))"
           >
             Remove
           </el-button>
         </el-button-group>
       </div>
       <el-form inline>
-        <el-form-item v-if="filter">
+        <el-form-item>
           <el-select
             v-model="filterForm.category"
             filterable
@@ -63,7 +63,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="filter">
+        <el-form-item>
           <el-select
             v-model="filterForm.tag"
             filterable
@@ -116,13 +116,13 @@
           </template>
         </el-table-column>
         <el-table-column
-          v-if="articleType==='post'"
+          v-if="type==='post'"
           sortable
           prop="categories"
           label="Categories"
         />
         <el-table-column
-          v-if="articleType==='post'"
+          v-if="type==='post'"
           sortable
           prop="tags"
           label="Tags"
@@ -163,7 +163,7 @@
               plain
               size="small"
               type="success"
-              @click="handlePublish(row._id)"
+              @click="handlePublish(row.id)"
             >
               Publish
             </el-button>
@@ -172,7 +172,7 @@
               plain
               size="small"
               type="warning"
-              @click="handleUnpublish(row._id)"
+              @click="handleUnpublish(row.id)"
             >
               Unpublish
             </el-button>
@@ -180,7 +180,7 @@
               plain
               size="small"
               type="danger"
-              @click="confirmRemove(() => handleRemove(row._id))"
+              @click="confirmRemove(() => handleRemove(row.id))"
             >
               Remove
             </el-button>
@@ -218,13 +218,8 @@ import pageApi from "../service/page";
 import taxonomyApi from "../service/taxonomy";
 
 const router = useRouter();
-const props = defineProps({
-    "articleType": String,
-    "filter": {
-        "type": Boolean,
-        "default": false,
-    } });
-const api = props.articleType === "post" ? postApi : pageApi;
+const props = defineProps(["type"]);
+const api = props.type === "post" ? postApi : pageApi;
 
 const multipleSelection = ref([]);
 
@@ -239,7 +234,7 @@ const isLoading = ref(true);
 
 const tableData = computed(() =>
     articleList.value.map((p)=> ({
-        "_id": p._id,
+        "id": p.id,
         "title": p.title,
         "link": p.link,
         "categories": p.categories?.join(", ") || "-",
@@ -247,9 +242,9 @@ const tableData = computed(() =>
         "updated": dateFormat(new Date(p.updated), "yyyy-mm-dd HH:MM:ss"),
         "date": dateFormat(new Date(p.date), "yyyy-mm-dd HH:MM:ss"),
         "isDraft": p.isDraft,
-        "to": props.articleType === "post" ?
-            { "name": "EditPost", "params": { "postId": p._id } }:
-            { "name": "EditPage", "params": { "pageId": p._id } },
+        "to": props.type === "post" ?
+            { "name": "EditPost", "params": { "postId": p.id } }:
+            { "name": "EditPage", "params": { "pageId": p.id } },
     })),
 );
 
@@ -269,9 +264,9 @@ async function handlePublish(articleId) {
     const { code, data } = await api.publish(articleId);
     if (code) return;
     ElMessage.success("Published successfully!");
-    const p = articleList.value.find(p => p._id === articleId);
+    const p = articleList.value.find(p => p.id === articleId);
     p.isDraft = false;
-    p._id = data._id;
+    p.id = data.id;
     articleList.value = [...articleList.value];
 }
 
@@ -279,9 +274,9 @@ async function handleUnpublish(articleId) {
     const { code, data } = await api.unpublish(articleId);
     if (code) return;
     ElMessage.success("Unpublished successfully!");
-    const p = articleList.value.find(p => p._id === articleId);
+    const p = articleList.value.find(p => p.id === articleId);
     p.isDraft = true;
-    p._id = data._id;
+    p.id = data.id;
     articleList.value = [...articleList.value];
 }
 
@@ -289,7 +284,7 @@ async function handleRemove(articleId) {
     const { code } = await api.remove(articleId);
     if (code) return;
     ElMessage.success("Removed successfully!");
-    const pIdx = articleList.value.findIndex(p => p._id === articleId);
+    const pIdx = articleList.value.findIndex(p => p.id === articleId);
     articleList.value.splice(pIdx, 1);
     loadList(currentPage.value);
 }
@@ -336,10 +331,8 @@ watch(filterForm, () => loadList(1));
 watch(currentPage, loadList);
 onMounted(() => {
     loadList(1);
-    if (props.filter) {
-        searchCategoryName();
-        searchTagName();
-    }
+    searchCategoryName();
+    searchTagName();
 });
 </script>
 

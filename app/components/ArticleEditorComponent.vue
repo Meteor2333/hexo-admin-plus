@@ -140,8 +140,8 @@ vMdEditor.use(githubTheme, {
 });
 
 const emit = defineEmits(["create"]);
-const props = defineProps(["articleId", "articleApi"]);
-const api = props.articleApi;
+const props = defineProps(["article", "api"]);
+const api = props.api;
 
 const formRef = ref(null);
 const metaForm = reactive({});
@@ -151,8 +151,8 @@ const advancedDialogVisible = ref(false);
 const meta = ref("");
 const content = ref("");
 onMounted(async () => {
-    if (props.articleId) {
-        const { data } = await api.raw(props.articleId);
+    if (props.article) {
+        const { data } = await api.getData(props.article);
         meta.value = data.meta;
         Object.assign(metaForm, YAML.load(meta.value) || {});
         content.value = data.content;
@@ -186,8 +186,8 @@ async function handleSave() {
     ElMessage.primary("Saving...");
     if (!meta.value) meta.value = YAML.dump(metaForm);
     const info = { "meta": meta.value, "content": content.value };
-    if (props.articleId) {
-        const { code } = await api.update(props.articleId, info);
+    if (props.article) {
+        const { code } = await api.update(props.article, info);
         if (!code) {
             saveDialogVisible.value = false;
             ElMessage.success("Updated successfully!");
@@ -206,7 +206,7 @@ async function handleUploadImage(_event, insertImage, files) {
     void _event;
     void insertImage;
     void files;
-    //todo: 实现
+    // todo: 实现
     // const { data } = await api.uploadImage(files[0]);
     // insertImage({ url: data.url });
 }

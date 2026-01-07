@@ -1,5 +1,5 @@
 <template>
-  <article-list article-type="page" />
+  <article-list type="page" />
 </template>
 
 <script setup>

@@ -14,29 +14,16 @@ module.exports = class ArticleService {
         this.model = this.hexo.model(this.type);
     }
 
-    getSource(fullPath) {
-        return fullPath.slice(this.hexo.source_dir.length).replace(/\\/g, "/");
-    }
-
-    list({ category, tag, title }) {
+    getArticles({ title, category, tag }) {
         return this.model.filter(i =>
-            (!category || i.categories.some(c => c.name === category)) &&
-                (!tag || i.tags.some(c => c.name === tag)) &&
-                (!title || i.title.includes(title)),
-        )
-            .sort("date", -1);
+            (!title || i.title.includes(title)) &&
+                (!category || i.categories.some(c => c.name === category)) &&
+                (!tag || i.tags.some(c => c.name === tag))
+        ).sort("date", -1);
     }
 
-    detail(query) {
-        if (typeof (query) === "string") {
-            return this.model.findById(query);
-        } else {
-            return this.model.findOne(query);
-        }
-    }
-
-    raw(query) {
-        const doc = this.detail(query);
+    getData(query) {
+        const doc = this.findModel(query);
         if (!doc) return null;
         return hfm.split(doc.raw);
     }
@@ -52,16 +39,16 @@ module.exports = class ArticleService {
             compiled.categories = compiled.categories || [this.hexo.config.default_category];
         }
 
-        //todo: 初次创建文章时先草稿状态
         const file = await this.hexo.post.create(compiled);
         await this.hexo.source.process();
-        return this.detail({ "source": this.getSource(file.path) });
+        return this.findModel({ "source": this.toRelativePath(file.path) });
     }
 
     async update(id, { meta, content }) {
-        const doc = this.detail(id);
-        const compiled = hfm.parse(["---", meta, "---", content].join("\n"));
+        const doc = this.findModel(id);
+        if (!doc) throw new Error("The article with ID " + id + " could not be found.");
 
+        const compiled = hfm.parse(["---", meta, "---", content].join("\n"));
         compiled.updated = compiled.updated || new Date();
         compiled.date = compiled.date || new Date(doc.date.valueOf());
         compiled.author = compiled.author || doc.author || this.hexo.config.author;
@@ -71,11 +58,13 @@ module.exports = class ArticleService {
 
         await fs.writeFile(doc.full_source, hfm.stringify(compiled));
         await this.hexo.source.process();
-        return this.detail({ "source": this.getSource(doc.full_source) });
+        return this.findModel({ "source": this.toRelativePath(doc.full_source) });
     }
 
     async delete(id) {
-        const doc = this.detail(id);
+        const doc = this.findModel(id);
+        if (!doc) throw new Error("The article with ID " + id + " could not be found.");
+
         if (this.type === "Page") {
             await fs.rmdir(path.dirname(doc.full_source));
         } else if (this.type === "Post") {
@@ -85,33 +74,46 @@ module.exports = class ArticleService {
     }
 
     async publish(id) {
-        if (this.type === "Page") return;
-        const doc = this.detail(id);
+        if (this.type !== "Post") return;
+
+        const doc = this.findModel(id);
+        if (!doc) throw new Error("The article with ID " + id + " could not be found.");
+
         const postDir = path.join(this.hexo.source_dir, "_posts");
         const fullSource = path.join(postDir, path.basename(doc.full_source));
-
         const exists = await fs.exists(postDir);
         if (!exists) await fs.mkdir(postDir);
+
         await fs.rename(doc.full_source, fullSource);
         await this.hexo.source.process();
-
-        const source = this.getSource(fullSource);
-        return this.detail({ source });
+        return this.findModel({ "source": this.toRelativePath(fullSource) });
     }
 
     async unpublish(id) {
-        if (this.type === "Page") return;
-        const doc = this.detail(id);
+        if (this.type !== "Post") return;
+
+        const doc = this.findModel(id);
+        if (!doc) throw new Error("The article with ID " + id + " could not be found.");
+
         const draftDir = path.join(this.hexo.source_dir, "_drafts");
         const fullSource = path.join(draftDir, path.basename(doc.full_source));
-
         const exists = await fs.exists(draftDir);
         if (!exists) await fs.mkdir(draftDir);
+
         await fs.rename(doc.full_source, fullSource);
         await this.hexo.source.process();
+        return this.findModel({ "source": this.toRelativePath(fullSource) });
+    }
 
-        const source = this.getSource(fullSource);
-        await this.hexo.source.process();
-        return this.detail({ source });
+    findModel(query) {
+        if (typeof (query) === "string") {
+            return this.model.findById(query);
+        } else {
+            return this.model.findOne(query);
+        }
+    }
+
+    toRelativePath(path) {
+        return path.slice(this.hexo.source_dir.length).replace(/\\/g, "/");
     }
 };

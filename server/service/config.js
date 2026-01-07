@@ -14,40 +14,40 @@ module.exports = class ConfigService {
     }
 
     async getConfig() {
-        const configPath = this.hexo.config_path;
-        if (await exists(configPath)) {
-            return readFile(configPath);
+        const path = this.hexo.config_path;
+        if (await exists(path)) {
+            return readFile(path);
         }
     }
 
     async updateConfig(data) {
-        const configPath = this.hexo.config_path;
-        await writeFile(configPath, data);
+        const path = this.hexo.config_path;
+        await writeFile(path, data);
 
         await loadConfig(this.hexo);
         await this.hexo.load();
     }
 
     async getThemeConfig() {
-        let configPath = join(this.hexo.base_dir,
+        let path = join(this.hexo.base_dir,
             `_config.${this.hexo.config.theme}.yml`);
-        if (!await exists(configPath)) {
-            configPath = join(this.hexo.base_dir, `./themes/${this.hexo.config.theme}/_config.yml`);
+        if (!await exists(path)) {
+            path = join(this.hexo.base_dir, `./themes/${this.hexo.config.theme}/_config.yml`);
         }
-        return readFile(configPath);
+        return readFile(path);
     }
 
     async updateThemeConfig(data) {
-        let configPath = join(this.hexo.base_dir,
+        let path = join(this.hexo.base_dir,
             `_config.${this.hexo.config.theme}.yml`);
-        if (!await exists(configPath)) {
-            configPath = join(this.hexo.base_dir, `./themes/${this.hexo.config.theme}/_config.yml`);
+        if (!await exists(path)) {
+            path = join(this.hexo.base_dir, `./themes/${this.hexo.config.theme}/_config.yml`);
         }
-        await writeFile(configPath, data);
+        await writeFile(path, data);
 
         // hexo/lib/hexo/load_theme_config.js
-        const baseConfig = this.hexo.render.render({ "path": this.hexo.config_path });
-        this.hexo.config.theme_config = baseConfig.theme_config;
+        const config = this.hexo.render.render({ "path": this.hexo.config_path });
+        this.hexo.config.theme_config = config.theme_config;
         await loadThemeConfig(this.hexo);
         await this.hexo.load();
     }
