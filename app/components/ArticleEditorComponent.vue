@@ -5,6 +5,7 @@
     @keydown.meta.s.prevent.stop="saveDialogVisible = true"
   >
     <el-main class="page-body">
+      <!-- Codemirror放在Dialog里UI有问题 行号会挡住内容 目前还没有好的解决方案 -->
       <el-dialog
         v-model="advancedDialogVisible"
         title="Advanced Mode"

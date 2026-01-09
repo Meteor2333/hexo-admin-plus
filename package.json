@@ -32,7 +32,6 @@
     "server:lint": "eslint server --ext .js --fix"
   },
   "dependencies": {
-    "@codemirror/language-data": "^6.3.1",
     "@kangc/v-md-editor": "^2.3.18",
     "@vitejs/plugin-vue": "^4.3.4",
     "axios": "^1.5.0",

@@ -18,7 +18,7 @@ module.exports = class ArticleService {
         return this.model.filter(i =>
             (!title || i.title.includes(title)) &&
                 (!category || i.categories.some(c => c.name === category)) &&
-                (!tag || i.tags.some(c => c.name === tag))
+                (!tag || i.tags.some(c => c.name === tag)),
         ).sort("date", -1);
     }
 
