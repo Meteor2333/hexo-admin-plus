@@ -3,6 +3,7 @@
 [![NPM version](https://badge.fury.io/js/hexo-dashboard.svg)](https://www.npmjs.com/package/hexo-dashboard)
 [![Required Node version](https://img.shields.io/node/v/hexo)]()
 [![Dependencies Status](https://img.shields.io/librariesio/release/npm/hexo-dashboard)](https://libraries.io/npm/hexo-dashboard)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMeteor2333%2Fhexo-dashboard.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FMeteor2333%2Fhexo-dashboard?ref=badge_shield)
 
 A Vue-based dashboard for managing your [Hexo](https://hexo.io/) blog. Edit posts, pages, and configurations directly from the browser.
 
