@@ -17,3 +17,5 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: Meteor2333_hexo-dashboard
+          SONAR_ORGANIZATION: meteor2333
