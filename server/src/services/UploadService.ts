@@ -13,7 +13,7 @@ export default class UploadService {
   async upload(file: UploadedFile) {
     const filename = file.name;
     const base = basename(filename), ext = extname(filename);
-    const finalname = `${base}+${Date.now().toString(36)}${ext}`.replaceAll(/_/g, '');
+    const finalname = `${base}+${Date.now().toString(36)}${ext}`.replaceAll('_', '');
     const path = `assets/${finalname}`;
     await writeFile(join(this.hexo.source_dir, path), file.data);
     return encodeURI('/' + path);

@@ -151,10 +151,10 @@ const writeUsers = (configPath, content, users) => {
         // Replace existing dashboard section
         const pattern = /^dashboard:\s*\n(?:[ \t]+.+\n?)*/m;
         if (hasUsers) {
-            newContent = content.replace(pattern, serializeUsers(users) + '\n');
+            newContent = content.replaceAll(pattern, serializeUsers(users) + '\n');
         } else {
             // Remove dashboard section
-            newContent = content.replace(pattern, '').replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';
+            newContent = content.replaceAll(pattern, '').replaceAll(/\n{3,}/g, '\n\n').trimEnd() + '\n';
         }
     } else if (hasUsers) {
         // Append new dashboard section

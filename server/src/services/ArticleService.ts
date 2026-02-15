@@ -108,6 +108,6 @@ export default class ArticleService {
   }
 
   private toRelativePath(path: string) {
-    return path.slice(this.hexo.source_dir.length).replaceAll(/\\/g, '/');
+    return path.slice(this.hexo.source_dir.length).replaceAll('\\', '/');
   }
 };
